@@ -46,7 +46,15 @@ class ToolTip(object):
 
 def CreateToolTip(widget, text_func):
     toolTip = ToolTip(widget)
+    
     def enter(event): toolTip.showtip(text_func())
     def leave(event): toolTip.hidetip()
-    widget.bind('<Enter>', enter)
-    widget.bind('<Leave>', leave)
+    
+    # Recursive binding to ensure hovering anywhere on the card works
+    def bind_tree(w):
+        w.bind('<Enter>', enter)
+        w.bind('<Leave>', leave)
+        for child in w.winfo_children():
+            bind_tree(child)
+            
+    bind_tree(widget)
